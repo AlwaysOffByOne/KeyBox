@@ -4,7 +4,7 @@
 local addonName, addon = ...
 
 -- Settings will be loaded from defaults when addon loads
-local DEFAULT_SETTINGS
+local DEFAULT_SETTINGS = ShiftBoxDefaults.GetDefaultSettings()
 
 -- Settings will be loaded when addon loads
 local settings
