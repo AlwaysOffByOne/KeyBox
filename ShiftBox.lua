@@ -3,18 +3,8 @@
 
 local addonName, addon = ...
 
--- Default settings
-local DEFAULT_SETTINGS = {
-    posX = 0,
-    posY = 0,
-    width = 200,
-    height = 200,
-    r = 1,
-    g = 0,
-    b = 0,
-    alpha = 0.5,
-    borderWidth = 2,
-}
+-- Settings will be loaded from defaults when addon loads
+local DEFAULT_SETTINGS
 
 -- Settings will be loaded when addon loads
 local settings
@@ -150,6 +140,7 @@ ShiftBoxFrame:SetScript("OnEvent", function(self, event, arg1)
     
     if event == "ADDON_LOADED" and arg1 == addonName then
         -- Load settings after addon is loaded
+        DEFAULT_SETTINGS = ShiftBoxDefaults.GetDefaultSettings()
         settings = ShiftBoxUtils.LoadSettings(DEFAULT_SETTINGS)
         ShiftBoxUtils.DebugPrint("ShiftBox addon successfully loaded!", debugEnabled)
         UpdateBoxVisuals()

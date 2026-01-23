@@ -5,6 +5,7 @@
 ## Description: Display a box when Shift key is pressed
 ## SavedVariables: ShiftBoxSettings
 
+ShiftBox_Defaults.lua
 ShiftBox_Utils.lua
 ShiftBox_Edit.lua
 ShiftBox.lua

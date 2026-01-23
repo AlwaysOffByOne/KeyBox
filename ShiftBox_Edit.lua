@@ -47,23 +47,12 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
         return ShiftBoxEditorPanel
     end
     
-    -- Define preset colors
-    local PRESET_COLORS = {
-        { name = "Red", r = 1, g = 0, b = 0 },
-        { name = "Green", r = 0, g = 1, b = 0 },
-        { name = "Blue", r = 0, g = 0, b = 1 },
-        { name = "Yellow", r = 1, g = 1, b = 0 },
-        { name = "Purple", r = 1, g = 0, b = 1 },
-        { name = "Cyan", r = 0, g = 1, b = 1 },
-        { name = "White", r = 1, g = 1, b = 1 },
-        { name = "Orange", r = 1, g = 0.5, b = 0 },
-        { name = "Pink", r = 1, g = 0.75, b = 0.8 },
-        { name = "Gray", r = 0.5, g = 0.5, b = 0.5 },
-    }
+    -- Use preset colors from defaults
+    local PRESET_COLORS = ShiftBoxDefaults.PRESET_COLORS
     
     -- Create main frame
     local frame = CreateFrame("Frame", "ShiftBoxEditorPanel", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(350, 360)
+    frame:SetSize(ShiftBoxDefaults.UI.editorWidth, ShiftBoxDefaults.UI.editorHeight)
     frame:SetPoint("CENTER", UIParent, "CENTER", 300, 0)
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -84,7 +73,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     widthLabel:SetText("Width:")
     
     local widthInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    widthInput:SetSize(80, 20)
+    widthInput:SetSize(ShiftBoxDefaults.UI.inputWidth, ShiftBoxDefaults.UI.inputHeight)
     widthInput:SetPoint("LEFT", widthLabel, "RIGHT", 10, 0)
     widthInput:SetText(tostring(settings.width))
     widthInput:SetAutoFocus(false)
@@ -97,7 +86,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     heightLabel:SetText("Height:")
     
     local heightInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    heightInput:SetSize(80, 20)
+    heightInput:SetSize(ShiftBoxDefaults.UI.inputWidth, ShiftBoxDefaults.UI.inputHeight)
     heightInput:SetPoint("LEFT", heightLabel, "RIGHT", 10, 0)
     heightInput:SetText(tostring(settings.height))
     heightInput:SetAutoFocus(false)
@@ -110,7 +99,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     borderLabel:SetText("Border:")
     
     local borderInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    borderInput:SetSize(80, 20)
+    borderInput:SetSize(ShiftBoxDefaults.UI.inputWidth, ShiftBoxDefaults.UI.inputHeight)
     borderInput:SetPoint("LEFT", borderLabel, "RIGHT", 10, 0)
     borderInput:SetText(tostring(settings.borderWidth))
     borderInput:SetAutoFocus(false)
@@ -165,7 +154,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     alphaLabel:SetText("Alpha:")
     
     local alphaInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    alphaInput:SetSize(80, 20)
+    alphaInput:SetSize(ShiftBoxDefaults.UI.inputWidth, ShiftBoxDefaults.UI.inputHeight)
     alphaInput:SetPoint("LEFT", alphaLabel, "RIGHT", 10, 0)
     alphaInput:SetText(string.format("%.2f", settings.alpha))
     alphaInput:SetAutoFocus(false)
@@ -177,10 +166,10 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
         local bw = tonumber(borderInput:GetText()) or settings.borderWidth
         local a = tonumber(alphaInput:GetText()) or settings.alpha
         
-        w = math.max(50, w)
-        h = math.max(50, h)
-        bw = math.max(1, bw)
-        a = math.max(0, math.min(1, a))
+        w = math.max(ShiftBoxDefaults.CONSTRAINTS.minWidth, w)
+        h = math.max(ShiftBoxDefaults.CONSTRAINTS.minHeight, h)
+        bw = math.max(ShiftBoxDefaults.CONSTRAINTS.minBorder, bw)
+        a = math.max(ShiftBoxDefaults.CONSTRAINTS.minAlpha, math.min(ShiftBoxDefaults.CONSTRAINTS.maxAlpha, a))
         
         settings.width = w
         settings.height = h
@@ -197,7 +186,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     
     -- Save button
     local saveButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
-    saveButton:SetSize(80, 25)
+    saveButton:SetSize(ShiftBoxDefaults.UI.buttonWidth, ShiftBoxDefaults.UI.buttonHeight)
     saveButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 15, 10)
     saveButton:SetText("Save")
     saveButton:SetScript("OnClick", function()
@@ -206,10 +195,10 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
         local bw = tonumber(borderInput:GetText()) or settings.borderWidth
         local a = tonumber(alphaInput:GetText()) or settings.alpha
         
-        settings.width = math.max(50, w)
-        settings.height = math.max(50, h)
-        settings.borderWidth = math.max(1, bw)
-        settings.alpha = math.max(0, math.min(1, a))
+        settings.width = math.max(ShiftBoxDefaults.CONSTRAINTS.minWidth, w)
+        settings.height = math.max(ShiftBoxDefaults.CONSTRAINTS.minHeight, h)
+        settings.borderWidth = math.max(ShiftBoxDefaults.CONSTRAINTS.minBorder, bw)
+        settings.alpha = math.max(ShiftBoxDefaults.CONSTRAINTS.minAlpha, math.min(ShiftBoxDefaults.CONSTRAINTS.maxAlpha, a))
         
         ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
         ShiftBoxUtils.Print("Settings saved!")
@@ -218,7 +207,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     
     -- Reset button
     local resetButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
-    resetButton:SetSize(80, 25)
+    resetButton:SetSize(ShiftBoxDefaults.UI.buttonWidth, ShiftBoxDefaults.UI.buttonHeight)
     resetButton:SetPoint("BOTTOM", frame, "BOTTOM", 0, 10)
     resetButton:SetText("Reset")
     resetButton:SetScript("OnClick", function()
@@ -244,7 +233,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, textures, defaultSettings
     
     -- Close button
     local closeButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
-    closeButton:SetSize(80, 25)
+    closeButton:SetSize(ShiftBoxDefaults.UI.buttonWidth, ShiftBoxDefaults.UI.buttonHeight)
     closeButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -15, 10)
     closeButton:SetText("Close")
     closeButton:SetScript("OnClick", function()
