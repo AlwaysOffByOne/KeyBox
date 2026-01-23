@@ -1,0 +1,10 @@
+## Interface: 120000
+## Title: ShiftBox
+## Author: Fellvarg-Tanaris
+## Version: 1.0
+## Description: Display a box when Shift key is pressed
+## SavedVariables: ShiftBoxSettings
+
+ShiftBox_Utils.lua
+ShiftBox_Edit.lua
+ShiftBox.lua

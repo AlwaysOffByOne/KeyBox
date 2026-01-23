@@ -1,0 +1,21 @@
+{
+  "diagnostics": {
+    "undefined": false
+  },
+  "runtime": {
+    "globals": [
+      "CreateFrame",
+      "UIParent",
+      "IsShiftKeyDown",
+      "SLASH_SHIFTBOX1",
+      "SlashCmdList",
+      "GetCursorPosition",
+      "table",
+      "tonumber",
+      "tostring",
+      "math",
+      "string",
+      "_G"
+    ]
+  }
+}
