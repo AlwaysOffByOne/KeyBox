@@ -30,7 +30,7 @@ function ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
     end
 end
 
--- Function to set box color
+-- Function to set box color via command
 function ShiftBoxEdit.SetBoxColor(settings, r, g, b, alpha, textures, box)
     settings.r = tonumber(r) or settings.r
     settings.g = tonumber(g) or settings.g
@@ -38,127 +38,6 @@ function ShiftBoxEdit.SetBoxColor(settings, r, g, b, alpha, textures, box)
     settings.alpha = tonumber(alpha) or settings.alpha
     ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
     ShiftBoxUtils.Print(string.format("Color set to R:%.1f G:%.1f B:%.1f A:%.1f", settings.r, settings.g, settings.b, settings.alpha))
-end
-
--- Function to set box size
-function ShiftBoxEdit.SetBoxSize(settings, width, height, textures, box)
-    settings.width = tonumber(width) or settings.width
-    settings.height = tonumber(height) or settings.height
-    ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
-    ShiftBoxUtils.Print(string.format("Size set to %d x %d", settings.width, settings.height))
-end
-
--- Create the size editor UI window
-function ShiftBoxEdit.CreateSizeEditorWindow(box, settings, textures)
-    -- Check if window already exists
-    if ShiftBoxSizeEditor then
-        return ShiftBoxSizeEditor
-    end
-    
-    -- Create main frame
-    local frame = CreateFrame("Frame", "ShiftBoxSizeEditor", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(300, 240)
-    frame:SetPoint("CENTER", UIParent, "CENTER", 300, 0)
-    frame:SetMovable(true)
-    frame:EnableMouse(true)
-    frame:RegisterForDrag("LeftButton")
-    frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
-    frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-    
-    frame.TitleBg:SetHeight(25)
-    frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    frame.title:SetPoint("TOPLEFT", frame.TitleBg, "TOPLEFT", 8, -3)
-    frame.title:SetText("ShiftBox Size Editor")
-    
-    -- Width label and input
-    local widthLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    widthLabel:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -40)
-    widthLabel:SetText("Width:")
-    
-    local widthInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    widthInput:SetSize(80, 20)
-    widthInput:SetPoint("LEFT", widthLabel, "RIGHT", 10, 0)
-    widthInput:SetText(tostring(settings.width))
-    widthInput:SetAutoFocus(false)
-    
-    -- Height label and input
-    local heightLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    heightLabel:SetPoint("TOPLEFT", widthLabel, "BOTTOMLEFT", 0, -25)
-    heightLabel:SetText("Height:")
-    
-    local heightInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    heightInput:SetSize(80, 20)
-    heightInput:SetPoint("LEFT", heightLabel, "RIGHT", 10, 0)
-    heightInput:SetText(tostring(settings.height))
-    heightInput:SetAutoFocus(false)
-    
-    -- Border width label and input
-    local borderLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    borderLabel:SetPoint("TOPLEFT", heightLabel, "BOTTOMLEFT", 0, -25)
-    borderLabel:SetText("Border:")
-    
-    local borderInput = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    borderInput:SetSize(80, 20)
-    borderInput:SetPoint("LEFT", borderLabel, "RIGHT", 10, 0)
-    borderInput:SetText(tostring(settings.borderWidth))
-    borderInput:SetAutoFocus(false)
-    
-    -- Update preview on text change
-    local function UpdatePreview()
-        local w = tonumber(widthInput:GetText()) or settings.width
-        local h = tonumber(heightInput:GetText()) or settings.height
-        local bw = tonumber(borderInput:GetText()) or settings.borderWidth
-        w = math.max(50, w)
-        h = math.max(50, h)
-        bw = math.max(1, bw)
-        settings.width = w
-        settings.height = h
-        settings.borderWidth = bw
-        ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
-    end
-    
-    widthInput:SetScript("OnTextChanged", UpdatePreview)
-    heightInput:SetScript("OnTextChanged", UpdatePreview)
-    borderInput:SetScript("OnTextChanged", UpdatePreview)
-    
-    -- Apply button
-    local applyButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
-    applyButton:SetSize(80, 25)
-    applyButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 15, 10)
-    applyButton:SetText("Apply")
-    applyButton:SetScript("OnClick", function()
-        local w = tonumber(widthInput:GetText()) or settings.width
-        local h = tonumber(heightInput:GetText()) or settings.height
-        local bw = tonumber(borderInput:GetText()) or settings.borderWidth
-        settings.width = math.max(50, w)
-        settings.height = math.max(50, h)
-        settings.borderWidth = math.max(1, bw)
-        ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
-        ShiftBoxUtils.Print(string.format("Size set to %d x %d, Border: %d", settings.width, settings.height, settings.borderWidth))
-        ShiftBoxUtils.SaveSettings(settings)
-        frame:Hide()
-    end)
-    
-    -- Cancel button
-    local cancelButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
-    cancelButton:SetSize(80, 25)
-    cancelButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -15, 10)
-    cancelButton:SetText("Cancel")
-    cancelButton:SetScript("OnClick", function()
-        widthInput:SetText(tostring(settings.width))
-        heightInput:SetText(tostring(settings.height))
-        borderInput:SetText(tostring(settings.borderWidth))
-        ShiftBoxEdit.UpdateBoxVisuals(box, settings, textures)
-        frame:Hide()
-    end)
-    
-    return frame
-end
-
--- Show the size editor window
-function ShiftBoxEdit.ShowSizeEditor(box, settings, textures)
-    local frame = ShiftBoxEdit.CreateSizeEditorWindow(box, settings, textures)
-    frame:Show()
 end
 
 -- Create comprehensive editor panel with all controls
@@ -405,50 +284,6 @@ function ShiftBoxEdit.ShowEditorPanel(box, settings, textures, defaultSettings)
         _G.ShiftBoxEditorOpen = false
     end
     _G.ShiftBoxEditorOpen = true
-end
-
--- Function to toggle edit mode
-function ShiftBoxEdit.ToggleEditMode(editMode, box, editOverlay, resizeHandle, settings, isResizing, textures)
-    editMode = not editMode
-    
-    if editMode then
-        box:Show()
-        editOverlay:Show()
-        resizeHandle:Show()
-        box:SetUserPlaced(false)
-        box:EnableMouse(true)
-        box:SetMovable(true)
-        box:RegisterForDrag("LeftButton")
-        
-        box:SetScript("OnDragStart", function(self)
-            if not isResizing then
-                self:StartMoving()
-            end
-        end)
-        
-        box:SetScript("OnDragStop", function(self)
-            if not isResizing then
-                self:StopMovingOrSizing()
-                -- Save position relative to center
-                local centerX = (self:GetLeft() + self:GetRight()) / 2 - UIParent:GetWidth() / 2
-                local centerY = (self:GetTop() - self:GetBottom()) / 2 - UIParent:GetHeight() / 2
-                settings.posX = centerX
-                settings.posY = centerY
-            end
-        end)
-        
-        ShiftBoxUtils.Print("Edit mode ENABLED.")
-        ShiftBoxUtils.Print("Drag box to move | Use /shiftbox size to open size editor | /shiftbox color to change color", "|cff00FF00")
-    else
-        editOverlay:Hide()
-        resizeHandle:Hide()
-        box:EnableMouse(false)
-        box:SetMovable(false)
-        ShiftBoxUtils.SaveSettings(settings)
-        ShiftBoxUtils.Print("Edit mode DISABLED.")
-    end
-    
-    return editMode
 end
 
 -- Make it global so the main addon can access it

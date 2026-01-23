@@ -36,11 +36,6 @@ local bg = box:CreateTexture(nil, "BACKGROUND")
 bg:SetAllPoints(box)
 bg:SetColorTexture(0, 0, 0, 0)  -- Fully transparent
 
--- Create a yellow dotted border using frame borders
-local border = box:CreateTexture(nil, "BORDER")
-border:SetAllPoints(box)
-border:SetColorTexture(1, 1, 0, 0)  -- Yellow but fully transparent base
-
 -- Create visible yellow borders using thin frames
 local borderWidth = DEFAULT_SETTINGS.borderWidth
 
@@ -80,23 +75,6 @@ local rightTexture = rightBorder:CreateTexture(nil, "OVERLAY")
 rightTexture:SetAllPoints(rightBorder)
 rightTexture:SetColorTexture(1, 1, 0, 1)  -- Yellow
 
--- Edit mode overlay (semi-transparent for dragging)
-local editOverlay = box:CreateTexture(nil, "OVERLAY")
-editOverlay:SetAllPoints(box)
-editOverlay:SetColorTexture(1, 1, 1, 0.1)
-editOverlay:Hide()
-
--- Create a resize handle in the bottom-right corner
-local resizeHandle = CreateFrame("Frame", "ShiftBoxResizeHandle", box)
-resizeHandle:SetSize(20, 20)
-resizeHandle:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", 0, 0)
-resizeHandle:Hide()
-resizeHandle:SetMovable(true)
-
-local handleTexture = resizeHandle:CreateTexture(nil, "OVERLAY")
-handleTexture:SetAllPoints(resizeHandle)
-handleTexture:SetColorTexture(1, 1, 1, 0.7)
-
 -- Store all textures and borders in a table for easy reference
 local textures = {
     bg = bg,
@@ -112,8 +90,6 @@ local textures = {
 
 -- Track if Shift is currently pressed
 local isShiftPressed = false
-local editMode = false
-local isResizing = false
 local debugEnabled = false
 local editorOpen = false
 
@@ -189,7 +165,7 @@ keyListener:SetScript("OnUpdate", function(self)
     -- Check if editor is open using global flag
     editorOpen = _G.ShiftBoxEditorOpen or false
     
-    if not editorOpen and not editMode then  -- Only toggle box visibility if not in edit mode or editor
+    if not editorOpen then  -- Only toggle box visibility if editor is not open
         local shiftPressed = IsShiftKeyDown()
         
         if shiftPressed and not isShiftPressed then
