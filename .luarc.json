@@ -6,7 +6,11 @@
     "globals": [
       "CreateFrame",
       "UIParent",
+      "GetBindingText",
+      "IsKeyDown",
       "IsShiftKeyDown",
+      "IsControlKeyDown",
+      "IsAltKeyDown",
       "ColorPickerFrame",
       "SLASH_SHIFTBOX1",
       "SlashCmdList",
