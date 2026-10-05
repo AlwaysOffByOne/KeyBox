@@ -28,6 +28,10 @@ local function MigrateLegacySettings()
     end
 end
 
+function ShiftBoxSettingsManager.Copy(settings)
+    return CopySettings(settings)
+end
+
 function ShiftBoxSettingsManager.Replace(target, source)
     for key in pairs(target) do
         target[key] = nil

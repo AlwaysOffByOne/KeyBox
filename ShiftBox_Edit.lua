@@ -64,6 +64,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     -- Create main frame
     local frame = CreateFrame("Frame", "ShiftBoxEditorPanel", UIParent, "BasicFrameTemplateWithInset")
     editorPanel = frame
+    frame:Hide()
     frame:SetClampedToScreen(true)
     UpdateEditorLayout(frame)
     frame:SetMovable(true)
@@ -71,13 +72,6 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     frame:RegisterForDrag("LeftButton")
     frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
     frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-    frame:SetScript("OnShow", function(self)
-        UpdateEditorLayout(self)
-        ShiftBoxBox.EnableDragging(box, settings)
-    end)
-    frame:SetScript("OnHide", function()
-        ShiftBoxBox.DisableDragging(box)
-    end)
     UIParent:HookScript("OnSizeChanged", function()
         if frame:IsShown() then
             UpdateEditorLayout(frame)
@@ -221,6 +215,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         opacity = opacityInput,
     }
     local isRefreshing = false
+    local sessionBaseline
 
     -- Update preview on text change
     local function UpdatePreview()
@@ -231,17 +226,43 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         ShiftBoxBox.UpdateVisuals(box, settings)
     end
 
-    local function LoadIntoEditor(source)
+    local function RefreshInputs()
         isRefreshing = true
-        ShiftBoxSettingsManager.Replace(settings, source)
         widthInput:SetText(tostring(settings.width))
         heightInput:SetText(tostring(settings.height))
         borderInput:SetText(tostring(settings.borderWidth))
         opacityInput:SetText(string.format("%.0f", settings.alpha * 100))
         UpdateColorSwatch()
         isRefreshing = false
+    end
+
+    local function LoadIntoEditor(source)
+        ShiftBoxSettingsManager.Replace(settings, source)
+        RefreshInputs()
         ShiftBoxBox.ApplySettings(box, settings)
     end
+
+    local function CommitEditorState()
+        sessionBaseline = ShiftBoxSettingsManager.Copy(settings)
+    end
+
+    frame:SetScript("OnShow", function(self)
+        UpdateEditorLayout(self)
+        RefreshInputs()
+        CommitEditorState()
+        ShiftBoxBox.EnableDragging(box, settings)
+    end)
+    frame:SetScript("OnHide", function()
+        if ColorPickerFrame:IsShown() then
+            ColorPickerFrame:Hide()
+        end
+        if sessionBaseline then
+            ShiftBoxSettingsManager.Replace(settings, sessionBaseline)
+            ShiftBoxBox.ApplySettings(box, settings)
+            sessionBaseline = nil
+        end
+        ShiftBoxBox.DisableDragging(box)
+    end)
     
     widthInput:SetScript("OnTextChanged", UpdatePreview)
     heightInput:SetScript("OnTextChanged", UpdatePreview)
@@ -252,6 +273,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         UpdatePreview()
         ShiftBoxBox.CapturePosition(box, settings)
         ShiftBoxSettingsManager.SaveCharacter(settings)
+        CommitEditorState()
         ShiftBoxUtils.Print("Character settings saved!")
     end)
     
@@ -259,6 +281,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         UpdatePreview()
         ShiftBoxBox.CapturePosition(box, settings)
         ShiftBoxSettingsManager.SaveAccount(settings)
+        CommitEditorState()
         ShiftBoxUtils.Print("Account default saved; character overrides were preserved.")
     end)
 
@@ -293,6 +316,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         function()
             ShiftBoxSettingsManager.ClearCharacter()
             LoadIntoEditor(ShiftBoxSettingsManager.LoadAccount(defaultSettings))
+            CommitEditorState()
             ShiftBoxUtils.Print("Character override cleared; using the account default.")
         end
     )
@@ -305,6 +329,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         function()
             ShiftBoxSettingsManager.ClearAccount()
             LoadIntoEditor(ShiftBoxSettingsManager.Load(defaultSettings))
+            CommitEditorState()
             ShiftBoxUtils.Print("Account default cleared; character overrides were preserved.")
         end
     )

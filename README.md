@@ -24,6 +24,8 @@ The editor provides these persistence actions:
 - **Reset Account** removes only the account default. Existing character overrides are preserved, while characters without overrides return to the base settings.
 - **Load Base Settings** loads a clean starting configuration into the editor. Use **Save Character** or **Save Account** afterward to persist it.
 
+Editor changes preview immediately. Closing with the title-bar **X** restores changes that have not been saved or applied through a reset action.
+
 Settings saved by earlier versions are migrated to the account default automatically.
 Size, border, color, alpha, and the dragged box position are included whenever character or account settings are saved.
 
