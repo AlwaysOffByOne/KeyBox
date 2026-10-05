@@ -55,47 +55,6 @@ local function CreateButton(frame, text, width, point, relativePoint, x, y, onCl
     return button
 end
 
--- Function to update box visuals
-function ShiftBoxEdit.UpdateBoxVisuals(box, settings)
-    box:SetBackdrop({
-        bgFile = ShiftBoxDefaults.BOX_TEXTURE,
-        edgeFile = ShiftBoxDefaults.BOX_TEXTURE,
-        edgeSize = settings.borderWidth,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
-    box:SetBackdropColor(0, 0, 0, 0)
-    box:SetBackdropBorderColor(settings.r, settings.g, settings.b, settings.alpha)
-    box:SetSize(settings.width, settings.height)
-end
-
-function ShiftBoxEdit.UpdateBoxPosition(box, settings)
-    box:ClearAllPoints()
-    box:SetPoint("CENTER", UIParent, "CENTER", settings.posX, settings.posY)
-end
-
-function ShiftBoxEdit.CaptureBoxPosition(box, settings)
-    local boxCenterX, boxCenterY = box:GetCenter()
-    local uiCenterX, uiCenterY = UIParent:GetCenter()
-    settings.posX = boxCenterX - uiCenterX
-    settings.posY = boxCenterY - uiCenterY
-end
-
-function ShiftBoxEdit.ApplyBoxSettings(box, settings)
-    ShiftBoxEdit.UpdateBoxVisuals(box, settings)
-    ShiftBoxEdit.UpdateBoxPosition(box, settings)
-end
-
--- Function to set box color via command
-function ShiftBoxEdit.SetBoxColor(box, settings, r, g, b, alpha)
-    local constraints = ShiftBoxDefaults.CONSTRAINTS
-    settings.r = ShiftBoxUtils.Clamp(tonumber(r) or settings.r, constraints.minColor, constraints.maxColor)
-    settings.g = ShiftBoxUtils.Clamp(tonumber(g) or settings.g, constraints.minColor, constraints.maxColor)
-    settings.b = ShiftBoxUtils.Clamp(tonumber(b) or settings.b, constraints.minColor, constraints.maxColor)
-    settings.alpha = ShiftBoxUtils.Clamp(tonumber(alpha) or settings.alpha, constraints.minAlpha, constraints.maxAlpha)
-    ShiftBoxEdit.UpdateBoxVisuals(box, settings)
-    ShiftBoxUtils.Print(string.format("Color set to R:%.1f G:%.1f B:%.1f A:%.1f", settings.r, settings.g, settings.b, settings.alpha))
-end
-
 -- Create comprehensive editor panel with all controls
 function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     if editorPanel then
@@ -112,7 +71,13 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     frame:RegisterForDrag("LeftButton")
     frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
     frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-    frame:SetScript("OnShow", function(self) UpdateEditorLayout(self) end)
+    frame:SetScript("OnShow", function(self)
+        UpdateEditorLayout(self)
+        ShiftBoxBox.EnableDragging(box, settings)
+    end)
+    frame:SetScript("OnHide", function()
+        ShiftBoxBox.DisableDragging(box)
+    end)
     UIParent:HookScript("OnSizeChanged", function()
         if frame:IsShown() then
             UpdateEditorLayout(frame)
@@ -226,7 +191,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         local function PreviewColor()
             settings.r, settings.g, settings.b = ColorPickerFrame:GetColorRGB()
             UpdateColorSwatch()
-            ShiftBoxEdit.UpdateBoxVisuals(box, settings)
+            ShiftBoxBox.UpdateVisuals(box, settings)
         end
 
         ColorPickerFrame:SetupColorPickerAndShow({
@@ -240,7 +205,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
                 settings.g = previousColor.g
                 settings.b = previousColor.b
                 UpdateColorSwatch()
-                ShiftBoxEdit.UpdateBoxVisuals(box, settings)
+                ShiftBoxBox.UpdateVisuals(box, settings)
             end,
         })
     end)
@@ -263,19 +228,19 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
             return
         end
         ApplyInputSettings(settings, inputs)
-        ShiftBoxEdit.UpdateBoxVisuals(box, settings)
+        ShiftBoxBox.UpdateVisuals(box, settings)
     end
 
     local function LoadIntoEditor(source)
         isRefreshing = true
-        ShiftBoxUtils.ReplaceSettings(settings, source)
+        ShiftBoxSettingsManager.Replace(settings, source)
         widthInput:SetText(tostring(settings.width))
         heightInput:SetText(tostring(settings.height))
         borderInput:SetText(tostring(settings.borderWidth))
         opacityInput:SetText(string.format("%.0f", settings.alpha * 100))
         UpdateColorSwatch()
         isRefreshing = false
-        ShiftBoxEdit.ApplyBoxSettings(box, settings)
+        ShiftBoxBox.ApplySettings(box, settings)
     end
     
     widthInput:SetScript("OnTextChanged", UpdatePreview)
@@ -285,15 +250,15 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     
     CreateButton(settingsPanel, "Save Character", ShiftBoxDefaults.UI.wideButtonWidth, "BOTTOMLEFT", "BOTTOMLEFT", 15, 10, function()
         UpdatePreview()
-        ShiftBoxEdit.CaptureBoxPosition(box, settings)
-        ShiftBoxUtils.SaveCharacterSettings(settings)
+        ShiftBoxBox.CapturePosition(box, settings)
+        ShiftBoxSettingsManager.SaveCharacter(settings)
         ShiftBoxUtils.Print("Character settings saved!")
     end)
     
     CreateButton(settingsPanel, "Save Account", ShiftBoxDefaults.UI.wideButtonWidth, "BOTTOMRIGHT", "BOTTOMRIGHT", -15, 10, function()
         UpdatePreview()
-        ShiftBoxEdit.CaptureBoxPosition(box, settings)
-        ShiftBoxUtils.SaveAccountSettings(settings)
+        ShiftBoxBox.CapturePosition(box, settings)
+        ShiftBoxSettingsManager.SaveAccount(settings)
         ShiftBoxUtils.Print("Account default saved; character overrides were preserved.")
     end)
 
@@ -326,8 +291,8 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         -20,
         "Reset Character",
         function()
-            ShiftBoxUtils.ClearCharacterSettings()
-            LoadIntoEditor(ShiftBoxUtils.LoadAccountSettings(defaultSettings))
+            ShiftBoxSettingsManager.ClearCharacter()
+            LoadIntoEditor(ShiftBoxSettingsManager.LoadAccount(defaultSettings))
             ShiftBoxUtils.Print("Character override cleared; using the account default.")
         end
     )
@@ -338,8 +303,8 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         -100,
         "Reset Account",
         function()
-            ShiftBoxUtils.ClearAccountSettings()
-            LoadIntoEditor(ShiftBoxUtils.LoadSettings(defaultSettings))
+            ShiftBoxSettingsManager.ClearAccount()
+            LoadIntoEditor(ShiftBoxSettingsManager.Load(defaultSettings))
             ShiftBoxUtils.Print("Account default cleared; character overrides were preserved.")
         end
     )
@@ -362,20 +327,7 @@ end
 function ShiftBoxEdit.ShowEditorPanel(box, settings, defaultSettings)
     local frame = ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     frame:Show()
-    
-    -- Enable dragging the box during edit
-    if not box:IsMouseEnabled() then
-        box:EnableMouse(true)
-        box:SetMovable(true)
-        box:RegisterForDrag("LeftButton")
-        box:SetScript("OnDragStart", function(self) self:StartMoving() end)
-        box:SetScript("OnDragStop", function(self)
-            self:StopMovingOrSizing()
-            ShiftBoxEdit.CaptureBoxPosition(self, settings)
-            ShiftBoxEdit.UpdateBoxPosition(self, settings)
-        end)
-    end
-    
+    ShiftBoxBox.EnableDragging(box, settings)
 end
 
 function ShiftBoxEdit.IsEditorOpen()

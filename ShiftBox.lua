@@ -13,12 +13,7 @@ local settings
 local ShiftBoxFrame = CreateFrame("Frame", "ShiftBoxMainFrame", UIParent)
 ShiftBoxFrame:RegisterEvent("ADDON_LOADED")
 
--- Create the box that will appear/disappear
-local box = CreateFrame("Frame", "ShiftBox", UIParent, "BackdropTemplate")
-box:SetMovable(true)
-box:SetSize(DEFAULT_SETTINGS.width, DEFAULT_SETTINGS.height)
-box:SetPoint("CENTER", UIParent, "CENTER", DEFAULT_SETTINGS.posX, DEFAULT_SETTINGS.posY)
-box:Hide()
+local box = ShiftBoxBox.Create(DEFAULT_SETTINGS)
 
 -- Track if Shift is currently pressed
 local isShiftPressed = false
@@ -55,9 +50,16 @@ SlashCmdList["SHIFTBOX"] = function(msg)
         ToggleDebugMode()
     elseif command == "color" then
         if #parts >= 4 then
-            ShiftBoxEdit.SetBoxColor(box, settings, parts[2], parts[3], parts[4], parts[5])
+            ShiftBoxBox.SetColor(box, settings, parts[2], parts[3], parts[4], parts[5])
+            ShiftBoxUtils.Print(string.format(
+                "Color set to R:%.1f G:%.1f B:%.1f A:%.1f",
+                settings.r,
+                settings.g,
+                settings.b,
+                settings.alpha
+            ))
         else
-            ShiftBoxUtils.Print("Usage: /shiftbox color <r> <g> <b> [alpha]")
+            ShiftBoxUtils.Print("Usage: /shiftbox color <r> <g> <b> [opacity]")
             ShiftBoxUtils.Print("Example: /shiftbox color 0.5 1 0 0.7  (Green with 70% alpha)")
         end
     elseif command == "help" then
@@ -77,9 +79,9 @@ ShiftBoxFrame:SetScript("OnEvent", function(self, event, arg1)
     
     if event == "ADDON_LOADED" and arg1 == addonName then
         -- Load settings after addon is loaded
-        settings = ShiftBoxUtils.LoadSettings(DEFAULT_SETTINGS)
+        settings = ShiftBoxSettingsManager.Load(DEFAULT_SETTINGS)
         ShiftBoxUtils.DebugPrint("ShiftBox addon successfully loaded!", debugEnabled)
-        ShiftBoxEdit.ApplyBoxSettings(box, settings)
+        ShiftBoxBox.ApplySettings(box, settings)
         ShiftBoxUtils.Print("Addon loaded! Use |cff00FF00/shiftbox help|r for commands.")
         self:UnregisterEvent("ADDON_LOADED")
     end
