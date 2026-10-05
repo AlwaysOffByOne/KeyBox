@@ -41,15 +41,6 @@ function ShiftBoxBox.ApplySettings(box, settings)
     ShiftBoxBox.UpdatePosition(box, settings)
 end
 
-function ShiftBoxBox.SetColor(box, settings, r, g, b, alpha)
-    local constraints = ShiftBoxDefaults.CONSTRAINTS
-    settings.r = ShiftBoxUtils.Clamp(tonumber(r) or settings.r, constraints.minColor, constraints.maxColor)
-    settings.g = ShiftBoxUtils.Clamp(tonumber(g) or settings.g, constraints.minColor, constraints.maxColor)
-    settings.b = ShiftBoxUtils.Clamp(tonumber(b) or settings.b, constraints.minColor, constraints.maxColor)
-    settings.alpha = ShiftBoxUtils.Clamp(tonumber(alpha) or settings.alpha, constraints.minAlpha, constraints.maxAlpha)
-    ShiftBoxBox.UpdateVisuals(box, settings)
-end
-
 function ShiftBoxBox.EnableDragging(box, settings)
     if box:IsMouseEnabled() then
         return

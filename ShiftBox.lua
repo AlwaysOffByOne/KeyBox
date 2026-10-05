@@ -48,24 +48,10 @@ SlashCmdList["SHIFTBOX"] = function(msg)
         ShowEditorPanel()
     elseif command == "debug" then
         ToggleDebugMode()
-    elseif command == "color" then
-        if #parts >= 4 then
-            ShiftBoxBox.SetColor(box, settings, parts[2], parts[3], parts[4], parts[5])
-            ShiftBoxUtils.Print(string.format(
-                "Color set to R:%.1f G:%.1f B:%.1f A:%.1f",
-                settings.r,
-                settings.g,
-                settings.b,
-                settings.alpha
-            ))
-        else
-            ShiftBoxUtils.Print("Usage: /shiftbox color <r> <g> <b> [opacity]")
-            ShiftBoxUtils.Print("Example: /shiftbox color 0.5 1 0 0.7  (Green with 70% alpha)")
-        end
     elseif command == "help" then
         ShiftBoxUtils.Print("Commands:")
+        ShiftBoxUtils.Print("/shiftbox - Open the editor panel")
         ShiftBoxUtils.Print("/shiftbox edit - Open the editor panel (size, border, color, position)")
-        ShiftBoxUtils.Print("/shiftbox color <r> <g> <b> [opacity] - Set color and optional opacity (values 0-1)")
         ShiftBoxUtils.Print("/shiftbox debug - Toggle debug messages")
         ShiftBoxUtils.Print("/shiftbox help - Show this message")
     else

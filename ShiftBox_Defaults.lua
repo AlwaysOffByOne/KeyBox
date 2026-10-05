@@ -39,8 +39,6 @@ ShiftBoxDefaults.CONSTRAINTS = {
     minBorder = 1,
     maxAlpha = 1,
     minAlpha = 0,
-    maxColor = 1,
-    minColor = 0,
 }
 
 function ShiftBoxDefaults.GetDefaultSettings()
