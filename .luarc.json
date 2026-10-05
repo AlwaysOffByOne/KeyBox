@@ -12,7 +12,7 @@
       "IsControlKeyDown",
       "IsAltKeyDown",
       "ColorPickerFrame",
-      "SLASH_SHIFTBOX1",
+      "SLASH_KEYBOX1",
       "SlashCmdList",
       "table",
       "tonumber",
