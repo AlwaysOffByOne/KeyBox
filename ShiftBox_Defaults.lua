@@ -6,6 +6,7 @@ local ShiftBoxDefaults = {}
 ShiftBoxDefaults.BOX_TEXTURE = "Interface\\ChatFrame\\ChatFrameBackground"
 
 ShiftBoxDefaults.SETTINGS = {
+    triggerKey = "SHIFT",
     posX = 0,
     posY = 0,
     width = 200,

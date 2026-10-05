@@ -1,5 +1,5 @@
 -- ShiftBox_Edit.lua
--- Functions for editing box size, color, and positioning
+-- Functions for editing the trigger, box size, color, and positioning
 
 local ShiftBoxEdit = {}
 
@@ -60,7 +60,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     if editorPanel then
         return editorPanel
     end
-    
+
     -- Create main frame
     local frame = CreateFrame("Frame", "ShiftBoxEditorPanel", UIParent, "BasicFrameTemplateWithInset")
     editorPanel = frame
@@ -77,7 +77,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
             UpdateEditorLayout(frame)
         end
     end)
-    
+
     frame.TitleBg:SetHeight(25)
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.title:SetPoint("TOPLEFT", frame.TitleBg, "TOPLEFT", 8, -3)
@@ -154,6 +154,25 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
 
     local yOffset = -15
 
+    local triggerLabel = settingsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    triggerLabel:SetPoint("TOPLEFT", settingsPanel, "TOPLEFT", 15, yOffset)
+    triggerLabel:SetText("Trigger key:")
+
+    local triggerButton = CreateFrame("Button", nil, settingsPanel, "GameMenuButtonTemplate")
+    triggerButton:SetSize(ShiftBoxDefaults.UI.wideButtonWidth, ShiftBoxDefaults.UI.buttonHeight)
+    triggerButton:SetPoint("LEFT", triggerLabel, "RIGHT", 10, 0)
+    triggerButton:SetText(ShiftBoxInput.GetKeyDisplayName(settings.triggerKey))
+    triggerButton:SetScript("OnClick", function(self)
+        self:SetText("Press a key...")
+        ShiftBoxInput.CaptureNextKey(function(key)
+            if key then
+                settings.triggerKey = key
+            end
+            self:SetText(ShiftBoxInput.GetKeyDisplayName(settings.triggerKey))
+        end)
+    end)
+    yOffset = yOffset - 35
+
     local widthInput = CreateLabeledInput(settingsPanel, "Width (px):", yOffset, tostring(settings.width))
     yOffset = yOffset - 30
 
@@ -162,12 +181,12 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
 
     local borderInput = CreateLabeledInput(settingsPanel, "Border (px):", yOffset, tostring(settings.borderWidth))
     yOffset = yOffset - 35
-    
+
     -- Color section
     local colorLabel = settingsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     colorLabel:SetPoint("TOPLEFT", settingsPanel, "TOPLEFT", 15, yOffset)
     colorLabel:SetText("Color:")
-    
+
     local colorButton = CreateFrame("Button", nil, settingsPanel, "BackdropTemplate")
     colorButton:SetSize(ShiftBoxDefaults.UI.colorSwatchWidth, ShiftBoxDefaults.UI.inputHeight)
     colorButton:SetPoint("LEFT", colorLabel, "RIGHT", 10, 0)
@@ -211,9 +230,9 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         })
     end)
     UpdateColorSwatch()
-    
+
     yOffset = yOffset - 30
-    
+
     local opacityInput = CreateLabeledInput(settingsPanel, "Opacity (%):", yOffset, string.format("%.0f", settings.alpha * 100))
     local inputs = {
         width = widthInput,
@@ -239,6 +258,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         heightInput:SetText(tostring(settings.height))
         borderInput:SetText(tostring(settings.borderWidth))
         opacityInput:SetText(string.format("%.0f", settings.alpha * 100))
+        triggerButton:SetText(ShiftBoxInput.GetKeyDisplayName(settings.triggerKey))
         UpdateColorSwatch()
         isRefreshing = false
     end
@@ -260,6 +280,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         ShiftBoxBox.EnableDragging(box, settings)
     end)
     frame:SetScript("OnHide", function()
+        ShiftBoxInput.CancelCapture()
         if ColorPickerFrame:IsShown() then
             ColorPickerFrame:Hide()
         end
@@ -270,12 +291,12 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         end
         ShiftBoxBox.DisableDragging(box)
     end)
-    
+
     widthInput:SetScript("OnTextChanged", UpdatePreview)
     heightInput:SetScript("OnTextChanged", UpdatePreview)
     borderInput:SetScript("OnTextChanged", UpdatePreview)
     opacityInput:SetScript("OnTextChanged", UpdatePreview)
-    
+
     CreateButton(settingsPanel, "Save Character", ShiftBoxDefaults.UI.wideButtonWidth, "BOTTOMLEFT", "BOTTOMLEFT", 15, 10, function()
         UpdatePreview()
         ShiftBoxBox.CapturePosition(box, settings)
@@ -283,7 +304,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         CommitEditorState()
         ShiftBoxUtils.Print("Character settings saved!")
     end)
-    
+
     CreateButton(settingsPanel, "Save Account", ShiftBoxDefaults.UI.wideButtonWidth, "BOTTOMRIGHT", "BOTTOMRIGHT", -15, 10, function()
         UpdatePreview()
         ShiftBoxBox.CapturePosition(box, settings)
@@ -366,7 +387,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
 
     CreateHelpSection(
         "Showing and editing",
-        "Hold either Shift key to show the box. Use /shiftbox to open the editor and drag the box.",
+        "Hold the configured trigger key to show the box. Click Trigger key to choose a new key; Escape cancels key capture.",
         -20
     )
     CreateHelpSection(
@@ -384,7 +405,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         "The title-bar X discards previews made after the most recent save or reset action.",
         -250
     )
-    
+
     return frame
 end
 

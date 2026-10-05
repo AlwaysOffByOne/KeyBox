@@ -1,5 +1,5 @@
 -- ShiftBox Addon - Main File
--- A simple addon that displays a box when you press Shift
+-- A simple addon that displays a box while a configured key is pressed
 
 local addonName = ...
 
@@ -35,15 +35,14 @@ ShiftBoxFrame:SetScript("OnEvent", function(self, event, arg1)
     end
 end)
 
--- Create a frame to listen for key press/release events
-local keyListener = CreateFrame("Frame")
-keyListener:SetScript("OnUpdate", function(self)
+local visibilityUpdater = CreateFrame("Frame")
+visibilityUpdater:SetScript("OnUpdate", function()
     if not settings then
         return
     end
 
-    local shiftPressed = IsShiftKeyDown()
-    local shouldShow = shiftPressed or ShiftBoxEdit.IsEditorOpen()
+    local triggerPressed = ShiftBoxInput.IsTriggerDown(settings.triggerKey)
+    local shouldShow = triggerPressed or ShiftBoxEdit.IsEditorOpen()
     if shouldShow ~= box:IsShown() then
         if shouldShow then
             box:Show()
