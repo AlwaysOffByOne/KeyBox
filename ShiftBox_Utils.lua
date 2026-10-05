@@ -13,12 +13,5 @@ function ShiftBoxUtils.Print(msg, color)
     print(color .. "[ShiftBox]|r " .. msg)
 end
 
--- Print a debug message if debug mode is enabled
-function ShiftBoxUtils.DebugPrint(msg, debugEnabled)
-    if debugEnabled then
-        ShiftBoxUtils.Print(msg, "|cff00FF00")
-    end
-end
-
 -- Make it global so other modules can access it
 _G.ShiftBoxUtils = ShiftBoxUtils

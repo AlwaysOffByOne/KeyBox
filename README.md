@@ -6,7 +6,7 @@ Some players have their abilities tied to a shift button but sometimes it can be
 
 ## Settings
 
-Open the editor with `/shiftbox` or `/shiftbox edit`. Settings are applied in this order:
+Open the editor with `/shiftbox`. Settings are applied in this order:
 
 1. Base settings.
 2. Your account default.
