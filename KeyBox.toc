@@ -1,0 +1,15 @@
+## Interface: 120000
+## Title: KeyBox
+## Author: Fellvarg-Tanaris
+## Version: 2.0
+## Description: Display a box while your chosen key is pressed
+## SavedVariables: KeyBoxAccountSettings
+## SavedVariablesPerCharacter: KeyBoxCharacterSettings
+
+KeyBox_Defaults.lua
+KeyBox_Utils.lua
+KeyBox_Settings.lua
+KeyBox_Box.lua
+KeyBox_Input.lua
+KeyBox_Edit.lua
+KeyBox.lua

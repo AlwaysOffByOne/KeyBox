@@ -1,12 +1,11 @@
-# WowShiftBox
-Sample Repo for attempted ShiftBox Addon
+# KeyBox
 
-# Simple AddOn
+## Simple AddOn
 Some players have abilities tied to a keyboard modifier or another key, but sometimes it can be hard to tell if that input is coming through. This simple addon puts a box on screen while a configured key is pressed so you can make sure that the right ability will be used.
 
 ## Settings
 
-Open the editor with `/shiftbox`. Settings are applied in this order:
+Open the editor with `/keybox`. Settings are applied in this order:
 
 1. Base settings.
 2. Your account default.
@@ -33,10 +32,10 @@ The trigger key, size, border, color, alpha, and dragged box position are includ
 
 ## Code organization
 
-- `ShiftBox.lua` coordinates add-on events, slash commands, and box visibility.
-- `ShiftBox_Defaults.lua` defines base settings, constraints, and UI dimensions.
-- `ShiftBox_Settings.lua` owns settings precedence, persistence, and resets.
-- `ShiftBox_Box.lua` owns box rendering, positioning, color updates, and edit-mode dragging.
-- `ShiftBox_Input.lua` tracks keyboard state and captures a configured trigger key without consuming gameplay input.
-- `ShiftBox_Edit.lua` builds and manages the editor UI.
-- `ShiftBox_Utils.lua` contains small shared helpers for clamping and messages.
+- `KeyBox.lua` coordinates add-on events, slash commands, and box visibility.
+- `KeyBox_Defaults.lua` defines base settings, constraints, and UI dimensions.
+- `KeyBox_Settings.lua` owns settings precedence, persistence, and resets.
+- `KeyBox_Box.lua` owns box rendering, positioning, color updates, and edit-mode dragging.
+- `KeyBox_Input.lua` tracks keyboard state and captures a configured trigger key without consuming gameplay input.
+- `KeyBox_Edit.lua` builds and manages the editor UI.
+- `KeyBox_Utils.lua` contains small shared helpers for clamping and messages.

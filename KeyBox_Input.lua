@@ -1,7 +1,7 @@
--- ShiftBox_Input.lua
+-- KeyBox_Input.lua
 -- Keyboard input tracking and trigger-key capture
 
-local ShiftBoxInput = {}
+local KeyBoxInput = {}
 
 local MODIFIER_KEYS = {
     LSHIFT = "SHIFT",
@@ -45,7 +45,7 @@ listener:SetScript("OnKeyDown", function(self, key)
     end
 end)
 
-function ShiftBoxInput.IsTriggerDown(triggerKey)
+function KeyBoxInput.IsTriggerDown(triggerKey)
     local normalizedTrigger = NormalizeKey(triggerKey)
     if not normalizedTrigger then
         return false
@@ -62,17 +62,17 @@ function ShiftBoxInput.IsTriggerDown(triggerKey)
     return IsKeyDown(normalizedTrigger, true) or false
 end
 
-function ShiftBoxInput.CaptureNextKey(callback)
+function KeyBoxInput.CaptureNextKey(callback)
     captureCallback = callback
     listener:EnableKeyboard(true)
 end
 
-function ShiftBoxInput.CancelCapture()
+function KeyBoxInput.CancelCapture()
     captureCallback = nil
     listener:EnableKeyboard(false)
 end
 
-function ShiftBoxInput.GetKeyDisplayName(key)
+function KeyBoxInput.GetKeyDisplayName(key)
     local normalizedKey = NormalizeKey(key)
     if not normalizedKey then
         return "Not set"
@@ -89,4 +89,4 @@ function ShiftBoxInput.GetKeyDisplayName(key)
     return normalizedKey
 end
 
-_G.ShiftBoxInput = ShiftBoxInput
+_G.KeyBoxInput = KeyBoxInput

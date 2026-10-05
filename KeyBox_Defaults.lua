@@ -1,11 +1,11 @@
--- ShiftBox_Defaults.lua
--- Default settings and constants for ShiftBox addon
+-- KeyBox_Defaults.lua
+-- Default settings and constants for KeyBox addon
 
-local ShiftBoxDefaults = {}
+local KeyBoxDefaults = {}
 
-ShiftBoxDefaults.BOX_TEXTURE = "Interface\\ChatFrame\\ChatFrameBackground"
+KeyBoxDefaults.BOX_TEXTURE = "Interface\\ChatFrame\\ChatFrameBackground"
 
-ShiftBoxDefaults.SETTINGS = {
+KeyBoxDefaults.SETTINGS = {
     triggerKey = "SHIFT",
     posX = 0,
     posY = 0,
@@ -19,7 +19,7 @@ ShiftBoxDefaults.SETTINGS = {
 }
 
 -- UI Element Sizes
-ShiftBoxDefaults.UI = {
+KeyBoxDefaults.UI = {
     editorWidth = 350,
     editorHeight = 360,
     editorScreenMargin = 20,
@@ -34,7 +34,7 @@ ShiftBoxDefaults.UI = {
 }
 
 -- Constraints
-ShiftBoxDefaults.CONSTRAINTS = {
+KeyBoxDefaults.CONSTRAINTS = {
     minWidth = 50,
     minHeight = 50,
     minBorder = 1,
@@ -42,13 +42,13 @@ ShiftBoxDefaults.CONSTRAINTS = {
     minAlpha = 0,
 }
 
-function ShiftBoxDefaults.GetDefaultSettings()
+function KeyBoxDefaults.GetDefaultSettings()
     local settings = {}
-    for key, value in pairs(ShiftBoxDefaults.SETTINGS) do
+    for key, value in pairs(KeyBoxDefaults.SETTINGS) do
         settings[key] = value
     end
     return settings
 end
 
 -- Make it global so other modules can access it
-_G.ShiftBoxDefaults = ShiftBoxDefaults
+_G.KeyBoxDefaults = KeyBoxDefaults
