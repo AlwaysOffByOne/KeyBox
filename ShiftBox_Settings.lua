@@ -19,15 +19,6 @@ local function MergeSettings(base, overrides)
     return merged
 end
 
-local function MigrateLegacySettings()
-    if ShiftBoxSettings then
-        if not ShiftBoxAccountSettings then
-            ShiftBoxAccountSettings = CopySettings(ShiftBoxSettings)
-        end
-        ShiftBoxSettings = nil
-    end
-end
-
 function ShiftBoxSettingsManager.Copy(settings)
     return CopySettings(settings)
 end
@@ -42,7 +33,6 @@ function ShiftBoxSettingsManager.Replace(target, source)
 end
 
 function ShiftBoxSettingsManager.LoadAccount(baseSettings)
-    MigrateLegacySettings()
     return MergeSettings(baseSettings, ShiftBoxAccountSettings)
 end
 
@@ -64,7 +54,6 @@ end
 
 function ShiftBoxSettingsManager.ClearAccount()
     ShiftBoxAccountSettings = nil
-    ShiftBoxSettings = nil
 end
 
 _G.ShiftBoxSettingsManager = ShiftBoxSettingsManager

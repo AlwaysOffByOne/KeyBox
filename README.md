@@ -27,14 +27,13 @@ The editor provides these persistence actions:
 
 Editor changes preview immediately. Closing with the title-bar **X** restores changes that have not been saved or applied through a reset action.
 
-Settings saved by earlier versions are migrated to the account default automatically.
 Size, border, color, alpha, and the dragged box position are included whenever character or account settings are saved.
 
 ## Code organization
 
 - `ShiftBox.lua` coordinates add-on events, slash commands, and Shift-key visibility.
 - `ShiftBox_Defaults.lua` defines base settings, constraints, and UI dimensions.
-- `ShiftBox_Settings.lua` owns settings precedence, persistence, resets, and legacy migration.
+- `ShiftBox_Settings.lua` owns settings precedence, persistence, and resets.
 - `ShiftBox_Box.lua` owns box rendering, positioning, color updates, and edit-mode dragging.
 - `ShiftBox_Edit.lua` builds and manages the editor UI.
 - `ShiftBox_Utils.lua` contains small shared helpers for clamping and messages.
