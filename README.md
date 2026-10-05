@@ -20,6 +20,7 @@ The editor provides these persistence actions:
 - **Save Character** saves the current settings only for the current character.
 - **Save Account** saves the current settings as the default for characters without an override. Existing character overrides are preserved.
 - The **Resets** tab contains the character reset, account reset, and base settings actions.
+- The **Help** tab summarizes Shift behavior, save scopes, reset behavior, and closing without saving.
 - **Reset Character** removes only the current character's override and loads the account default.
 - **Reset Account** removes only the account default. Existing character overrides are preserved, while characters without overrides return to the base settings.
 - **Load Base Settings** loads a clean starting configuration into the editor. Use **Save Character** or **Save Account** afterward to persist it.

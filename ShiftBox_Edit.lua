@@ -90,6 +90,9 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     local resetsPanel = CreateFrame("Frame", nil, frame)
     resetsPanel:SetAllPoints(settingsPanel)
 
+    local helpPanel = CreateFrame("Frame", nil, frame)
+    helpPanel:SetAllPoints(settingsPanel)
+
     local tabs = {}
     local selectedTab
 
@@ -113,6 +116,7 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         selectedTab = tabID
         settingsPanel:SetShown(tabID == 1)
         resetsPanel:SetShown(tabID == 2)
+        helpPanel:SetShown(tabID == 3)
         for _, tab in ipairs(tabs) do
             StyleTab(tab, false)
         end
@@ -142,6 +146,9 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
 
     local resetsTab = CreateEditorTab(2, "Resets")
     resetsTab:SetPoint("LEFT", settingsTab, "RIGHT", 4, 0)
+
+    local helpTab = CreateEditorTab(3, "Help")
+    helpTab:SetPoint("LEFT", resetsTab, "RIGHT", 4, 0)
 
     SelectTab(1)
 
@@ -343,6 +350,39 @@ function ShiftBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
             LoadIntoEditor(defaultSettings)
             ShiftBoxUtils.Print("Base settings loaded. Save them to the desired scope.")
         end
+    )
+
+    local function CreateHelpSection(title, description, y)
+        local titleText = helpPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        titleText:SetPoint("TOPLEFT", helpPanel, "TOPLEFT", 15, y)
+        titleText:SetText(title)
+
+        local descriptionText = helpPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        descriptionText:SetPoint("TOPLEFT", titleText, "BOTTOMLEFT", 0, -4)
+        descriptionText:SetPoint("RIGHT", helpPanel, "RIGHT", -15, 0)
+        descriptionText:SetJustifyH("LEFT")
+        descriptionText:SetText(description)
+    end
+
+    CreateHelpSection(
+        "Showing and editing",
+        "Hold either Shift key to show the box. Use /shiftbox to open the editor and drag the box.",
+        -20
+    )
+    CreateHelpSection(
+        "Saving",
+        "Save Character creates an override for this character. Save Account sets the default for characters without an override.",
+        -90
+    )
+    CreateHelpSection(
+        "Resetting",
+        "Reset Character returns to the account default. Reset Account removes the shared default but preserves character overrides.",
+        -170
+    )
+    CreateHelpSection(
+        "Closing",
+        "The title-bar X discards previews made after the most recent save or reset action.",
+        -250
     )
     
     return frame
