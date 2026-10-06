@@ -1,6 +1,8 @@
 -- KeyBox_Input.lua
 -- Keyboard input tracking and trigger-key capture
 
+local _, KeyBox = ...
+local L = KeyBox.L
 local KeyBoxInput = {}
 
 local MODIFIER_KEYS = {
@@ -13,9 +15,9 @@ local MODIFIER_KEYS = {
 }
 
 local MODIFIER_DISPLAY_NAMES = {
-    SHIFT = "Shift",
-    CTRL = "Ctrl",
-    ALT = "Alt",
+    SHIFT = L.KEY_SHIFT,
+    CTRL = L.KEY_CTRL,
+    ALT = L.KEY_ALT,
 }
 
 local captureCallback
@@ -75,7 +77,7 @@ end
 function KeyBoxInput.GetKeyDisplayName(key)
     local normalizedKey = NormalizeKey(key)
     if not normalizedKey then
-        return "Not set"
+        return L.NOT_SET
     end
 
     if MODIFIER_DISPLAY_NAMES[normalizedKey] then

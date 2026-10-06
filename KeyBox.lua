@@ -1,7 +1,8 @@
 -- KeyBox Addon - Main File
 -- A simple addon that displays a box while a configured key is pressed
 
-local addonName = ...
+local addonName, KeyBox = ...
+local L = KeyBox.L
 
 -- Settings will be loaded from defaults when addon loads
 local DEFAULT_SETTINGS = KeyBoxDefaults.GetDefaultSettings()
@@ -30,7 +31,7 @@ KeyBoxFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
         settings = KeyBoxSettingsManager.Load(DEFAULT_SETTINGS)
         KeyBoxBox.ApplySettings(box, settings)
-        KeyBoxUtils.Print("Addon loaded! Use |cff00FF00/keybox|r to open the editor.")
+        KeyBoxUtils.Print(L.ADDON_LOADED)
         self:UnregisterEvent("ADDON_LOADED")
     end
 end)

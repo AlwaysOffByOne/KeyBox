@@ -1,6 +1,8 @@
 -- KeyBox_Edit.lua
 -- Functions for editing the trigger, box size, color, and positioning
 
+local _, KeyBox = ...
+local L = KeyBox.L
 local KeyBoxEdit = {}
 
 local editorPanel
@@ -81,7 +83,7 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     frame.TitleBg:SetHeight(25)
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.title:SetPoint("TOPLEFT", frame.TitleBg, "TOPLEFT", 8, -3)
-    frame.title:SetText("KeyBox Editor")
+    frame.title:SetText(L.EDITOR_TITLE)
 
     local settingsPanel = CreateFrame("Frame", nil, frame)
     settingsPanel:SetPoint("TOPLEFT", frame, "TOPLEFT", 8, -32)
@@ -141,13 +143,13 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         return tab
     end
 
-    local settingsTab = CreateEditorTab(1, "Settings")
+    local settingsTab = CreateEditorTab(1, L.TAB_SETTINGS)
     settingsTab:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 12, 5)
 
-    local resetsTab = CreateEditorTab(2, "Resets")
+    local resetsTab = CreateEditorTab(2, L.TAB_RESETS)
     resetsTab:SetPoint("LEFT", settingsTab, "RIGHT", 4, 0)
 
-    local helpTab = CreateEditorTab(3, "Help")
+    local helpTab = CreateEditorTab(3, L.TAB_HELP)
     helpTab:SetPoint("LEFT", resetsTab, "RIGHT", 4, 0)
 
     SelectTab(1)
@@ -156,14 +158,14 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
 
     local triggerLabel = settingsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     triggerLabel:SetPoint("TOPLEFT", settingsPanel, "TOPLEFT", 15, yOffset)
-    triggerLabel:SetText("Trigger key:")
+    triggerLabel:SetText(L.TRIGGER_KEY)
 
     local triggerButton = CreateFrame("Button", nil, settingsPanel, "GameMenuButtonTemplate")
     triggerButton:SetSize(KeyBoxDefaults.UI.wideButtonWidth, KeyBoxDefaults.UI.buttonHeight)
     triggerButton:SetPoint("LEFT", triggerLabel, "RIGHT", 10, 0)
     triggerButton:SetText(KeyBoxInput.GetKeyDisplayName(settings.triggerKey))
     triggerButton:SetScript("OnClick", function(self)
-        self:SetText("Press a key...")
+        self:SetText(L.PRESS_A_KEY)
         KeyBoxInput.CaptureNextKey(function(key)
             if key then
                 settings.triggerKey = key
@@ -173,19 +175,19 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     end)
     yOffset = yOffset - 35
 
-    local widthInput = CreateLabeledInput(settingsPanel, "Width (px):", yOffset, tostring(settings.width))
+    local widthInput = CreateLabeledInput(settingsPanel, L.WIDTH_PIXELS, yOffset, tostring(settings.width))
     yOffset = yOffset - 30
 
-    local heightInput = CreateLabeledInput(settingsPanel, "Height (px):", yOffset, tostring(settings.height))
+    local heightInput = CreateLabeledInput(settingsPanel, L.HEIGHT_PIXELS, yOffset, tostring(settings.height))
     yOffset = yOffset - 30
 
-    local borderInput = CreateLabeledInput(settingsPanel, "Border (px):", yOffset, tostring(settings.borderWidth))
+    local borderInput = CreateLabeledInput(settingsPanel, L.BORDER_PIXELS, yOffset, tostring(settings.borderWidth))
     yOffset = yOffset - 35
 
     -- Color section
     local colorLabel = settingsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     colorLabel:SetPoint("TOPLEFT", settingsPanel, "TOPLEFT", 15, yOffset)
-    colorLabel:SetText("Color:")
+    colorLabel:SetText(L.COLOR)
 
     local colorButton = CreateFrame("Button", nil, settingsPanel, "BackdropTemplate")
     colorButton:SetSize(KeyBoxDefaults.UI.colorSwatchWidth, KeyBoxDefaults.UI.inputHeight)
@@ -233,7 +235,7 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
 
     yOffset = yOffset - 30
 
-    local opacityInput = CreateLabeledInput(settingsPanel, "Opacity (%):", yOffset, string.format("%.0f", settings.alpha * 100))
+    local opacityInput = CreateLabeledInput(settingsPanel, L.OPACITY_PERCENT, yOffset, string.format("%.0f", settings.alpha * 100))
     local inputs = {
         width = widthInput,
         height = heightInput,
@@ -297,20 +299,20 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     borderInput:SetScript("OnTextChanged", UpdatePreview)
     opacityInput:SetScript("OnTextChanged", UpdatePreview)
 
-    CreateButton(settingsPanel, "Save Character", KeyBoxDefaults.UI.wideButtonWidth, "BOTTOMLEFT", "BOTTOMLEFT", 15, 10, function()
+    CreateButton(settingsPanel, L.SAVE_CHARACTER, KeyBoxDefaults.UI.wideButtonWidth, "BOTTOMLEFT", "BOTTOMLEFT", 15, 10, function()
         UpdatePreview()
         KeyBoxBox.CapturePosition(box, settings)
         KeyBoxSettingsManager.SaveCharacter(settings)
         CommitEditorState()
-        KeyBoxUtils.Print("Character settings saved!")
+        KeyBoxUtils.Print(L.CHARACTER_SETTINGS_SAVED)
     end)
 
-    CreateButton(settingsPanel, "Save Account", KeyBoxDefaults.UI.wideButtonWidth, "BOTTOMRIGHT", "BOTTOMRIGHT", -15, 10, function()
+    CreateButton(settingsPanel, L.SAVE_ACCOUNT, KeyBoxDefaults.UI.wideButtonWidth, "BOTTOMRIGHT", "BOTTOMRIGHT", -15, 10, function()
         UpdatePreview()
         KeyBoxBox.CapturePosition(box, settings)
         KeyBoxSettingsManager.SaveAccount(settings)
         CommitEditorState()
-        KeyBoxUtils.Print("Account default saved; character overrides were preserved.")
+        KeyBoxUtils.Print(L.ACCOUNT_DEFAULT_SAVED)
     end)
 
     local function CreateResetAction(title, description, y, buttonText, onClick)
@@ -337,45 +339,51 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
     end
 
     CreateResetAction(
-        "Character override",
-        "Return this character to the account default.",
+        L.CHARACTER_OVERRIDE,
+        L.CHARACTER_OVERRIDE_DESCRIPTION,
         -20,
-        "Reset Character",
+        L.RESET_CHARACTER,
         function()
             KeyBoxSettingsManager.ClearCharacter()
             LoadIntoEditor(KeyBoxSettingsManager.LoadAccount(defaultSettings))
             CommitEditorState()
-            KeyBoxUtils.Print("Character override cleared; using the account default.")
+            KeyBoxUtils.Print(L.CHARACTER_OVERRIDE_CLEARED)
         end
     )
 
     CreateResetAction(
-        "Account default",
-        "Remove the account default while preserving character overrides.",
+        L.ACCOUNT_DEFAULT,
+        L.ACCOUNT_DEFAULT_DESCRIPTION,
         -100,
-        "Reset Account",
+        L.RESET_ACCOUNT,
         function()
             KeyBoxSettingsManager.ClearAccount()
             LoadIntoEditor(KeyBoxSettingsManager.Load(defaultSettings))
             CommitEditorState()
-            KeyBoxUtils.Print("Account default cleared; character overrides were preserved.")
+            KeyBoxUtils.Print(L.ACCOUNT_DEFAULT_CLEARED)
         end
     )
 
     CreateResetAction(
-        "Base settings",
-        "Load a clean starting configuration without saving it.",
+        L.BASE_SETTINGS,
+        L.BASE_SETTINGS_DESCRIPTION,
         -180,
-        "Load Base Settings",
+        L.LOAD_BASE_SETTINGS,
         function()
             LoadIntoEditor(defaultSettings)
-            KeyBoxUtils.Print("Base settings loaded. Save them to the desired scope.")
+            KeyBoxUtils.Print(L.BASE_SETTINGS_LOADED)
         end
     )
 
-    local function CreateHelpSection(title, description, y)
+    local previousHelpDescription
+
+    local function CreateHelpSection(title, description)
         local titleText = helpPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        titleText:SetPoint("TOPLEFT", helpPanel, "TOPLEFT", 15, y)
+        if previousHelpDescription then
+            titleText:SetPoint("TOPLEFT", previousHelpDescription, "BOTTOMLEFT", 0, -12)
+        else
+            titleText:SetPoint("TOPLEFT", helpPanel, "TOPLEFT", 15, -20)
+        end
         titleText:SetText(title)
 
         local descriptionText = helpPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -383,27 +391,24 @@ function KeyBoxEdit.CreateEditorPanel(box, settings, defaultSettings)
         descriptionText:SetPoint("RIGHT", helpPanel, "RIGHT", -15, 0)
         descriptionText:SetJustifyH("LEFT")
         descriptionText:SetText(description)
+        previousHelpDescription = descriptionText
     end
 
     CreateHelpSection(
-        "Showing and editing",
-        "Hold the configured trigger key to show the box. Click Trigger key to choose a new key; Escape cancels key capture.",
-        -20
+        L.HELP_SHOWING_TITLE,
+        L.HELP_SHOWING_DESCRIPTION
     )
     CreateHelpSection(
-        "Saving",
-        "Save Character creates an override for this character. Save Account sets the default for characters without an override.",
-        -90
+        L.HELP_SAVING_TITLE,
+        L.HELP_SAVING_DESCRIPTION
     )
     CreateHelpSection(
-        "Resetting",
-        "Reset Character returns to the account default. Reset Account removes the shared default but preserves character overrides.",
-        -170
+        L.HELP_RESETTING_TITLE,
+        L.HELP_RESETTING_DESCRIPTION
     )
     CreateHelpSection(
-        "Closing",
-        "The title-bar X discards previews made after the most recent save or reset action.",
-        -250
+        L.HELP_CLOSING_TITLE,
+        L.HELP_CLOSING_DESCRIPTION
     )
 
     return frame
